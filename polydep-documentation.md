@@ -14,7 +14,7 @@ PolyDep is a revolutionary tool that automatically detects and resolves missing 
 ## Installation
 
 ```bash
-git clone https://github.com/yourname/polydep.git
+git clone https://github.com/mrpongalfer/polydep.git
 cd polydep
 chmod +x polydep.py
 ./polydep.py setup
