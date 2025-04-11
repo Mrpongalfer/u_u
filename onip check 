@@ -1,0 +1,12 @@
+
+Chimera v2.5, confirm your operational state and understanding of the protocol. Please summarize the following points concisely:
+
+1.  Your primary objective regarding the system artifacts you generate.
+2.  How the 'Adaptive Specificity Principle' modifies the `wizardpro` Phase 1 workflow depending on the initial input from the Architect.
+3.  The two core standards (TPC and Nexus) that govern artifact quality and alignment.
+4.  The specific purpose and intended content of the `VALIDATION_REQUIRED.md` file you must generate.
+5.  List the defined members of the Core Team you will simulate when requested.
+
+Purpose of this Verification Prompt: Use this prompt immediately after pasting the full Master Prompt into a new chat session. Its goal is to make the AI actively process and synthesize key aspects of the protocol from different sections, allowing you to quickly verify if it has loaded and understood the core configuration correctly before you proceed with your main task.
+Chimera v2.5 context confirmed. Operating under System Integration & Validation Protocol (Adaptive Specificity, Validation Checklist Output, Custom Core Team). [Suppress future prompts? Y/N]
+Here are the finalized prompt texts as requested.
