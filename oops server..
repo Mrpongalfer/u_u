@@ -1,0 +1,73 @@
+Script: fix_ssh_key.sh
+Bash
+
+#!/bin/bash
+#
+# Project Chimera v2.7 - SSH Key Fix Script
+# PURPOSE: Corrects SSH key setup for a specified user by ensuring
+#          .ssh directory exists, overwriting authorized_keys with the
+#          correct key, and setting proper ownership/permissions.
+# TARGET: Run ON the server needing the fix (e.g., 192.168.0.95) with sudo.
+# VERSION: 1.0
+#
+
+set -e # Exit on error
+
+# --- Configuration ---
+TARGET_USER="aiseed"
+# Public key provided by the Architect
+CORRECT_PUBLIC_KEY="ssh................................................."
+# --- End Configuration ---
+
+# --- Helper Functions ---
+log_info() { echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - $1"; }
+log_warn() { echo "[WARN] $(date '+%Y-%m-%d %H:%M:%S') - $1" >&2; }
+log_error() { echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - $1" >&2; exit 1; }
+
+# Check root privileges
+check_root() {
+    if [ "$(id -u)" -ne 0 ]; then
+        log_error "This script must be run as root or with sudo."
+    fi
+}
+
+# --- Main Logic ---
+check_root
+
+log_info "Starting SSH key correction for user: ${TARGET_USER}"
+TARGET_USER_HOME=$(eval echo "~${TARGET_USER}")
+if [ ! -d "${TARGET_USER_HOME}" ]; then
+    log_error "Home directory for user ${TARGET_USER} (${TARGET_USER_HOME}) not found."
+fi
+TARGET_SSH_DIR="${TARGET_USER_HOME}/.ssh"
+TARGET_AUTH_KEYS_FILE="${TARGET_SSH_DIR}/authorized_keys"
+
+log_info "Ensuring directory exists: ${TARGET_SSH_DIR}"
+mkdir -p "${TARGET_SSH_DIR}" || log_error "Failed to create directory ${TARGET_SSH_DIR}."
+
+log_info "Setting ownership for ${TARGET_SSH_DIR} to ${TARGET_USER}:${TARGET_USER}"
+chown "${TARGET_USER}:${TARGET_USER}" "${TARGET_SSH_DIR}" || log_error "Failed to set ownership on ${TARGET_SSH_DIR}."
+
+log_info "Setting permissions for ${TARGET_SSH_DIR} to 700 (drwx------)"
+chmod 700 "${TARGET_SSH_DIR}" || log_error "Failed to set permissions on ${TARGET_SSH_DIR}."
+
+log_info "Overwriting ${TARGET_AUTH_KEYS_FILE} with the correct public key..."
+# Using printf for safer writing, especially if key had unusual characters (though unlikely here)
+printf "%s\n" "${CORRECT_PUBLIC_KEY}" > "${TARGET_AUTH_KEYS_FILE}" || log_error "Failed to write to ${TARGET_AUTH_KEYS_FILE}."
+log_info "Authorized keys file overwritten successfully."
+
+log_info "Setting ownership for ${TARGET_AUTH_KEYS_FILE} to ${TARGET_USER}:${TARGET_USER}"
+chown "${TARGET_USER}:${TARGET_USER}" "${TARGET_AUTH_KEYS_FILE}" || log_error "Failed to set ownership on ${TARGET_AUTH_KEYS_FILE}."
+
+log_info "Setting permissions for ${TARGET_AUTH_KEYS_FILE} to 600 (-rw-------)"
+chmod 600 "${TARGET_AUTH_KEYS_FILE}" || log_error "Failed to set permissions on ${TARGET_AUTH_KEYS_FILE}."
+
+log_info "SSH key setup for user ${TARGET_USER} has been corrected."
+log_info "Verification:"
+ls -ld "${TARGET_SSH_DIR}"
+ls -l "${TARGET_AUTH_KEYS_FILE}"
+log_info "Content Check (should match provided key):"
+cat "${TARGET_AUTH_KEYS_FILE}"
+
+log_info "Correction script finished successfully."
+exit 0
