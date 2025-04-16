@@ -1,0 +1,25 @@
+#!/bin/bash
+# -----------------------------------------------------
+# Elite SSH Key Setup for GitHub Access
+# -----------------------------------------------------
+echo "Checking for existing SSH key..."
+if [ -f ~/.ssh/id_rsa.pub ]; then
+    echo "Existing SSH public key found:"
+    cat ~/.ssh/id_rsa.pub
+else
+    echo "No SSH key found. Generating a new SSH key..."
+    ssh-keygen -t rsa -b 4096 -C "your_email@example.com" -f ~/.ssh/id_rsa -N ""
+    echo "New SSH key generated:"
+    cat ~/.ssh/id_rsa.pub
+fi
+
+echo "Starting ssh-agent and adding SSH key..."
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+
+echo "Please copy the above public key and add it to your GitHub account at:"
+echo "https://github.com/settings/keys"
+echo "Once this is done, you can test the connection with: ssh -T git@github.com"
+ssh -T git@github.com || echo "Connection test failed. Please ensure your key is added to GitHub."
+
+echo "SSH key setup complete."
